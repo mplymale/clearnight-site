@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClearNight — Know When the Stars Are Worth Chasing</title>
+  <meta name="description" content="ClearNight gives you a single clarity score for tonight's sky — based on cloud cover, moon phase, seeing, and light pollution — so you always know before you go." />
+  <meta property="og:title" content="ClearNight" />
+  <meta property="og:description" content="Know when the stars are worth chasing." />
+  <meta property="og:image" content="og-image.png" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0e1a;
+      --bg2: #0d1220;
+      --surface: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --teal: #7ef0d2;
+      --teal-dim: rgba(126,240,210,0.15);
+      --text: rgba(255,255,255,0.72);
+      --text-dim: rgba(255,255,255,0.45);
+      --white: #fff;
+      --font: 'Space Grotesk', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: clip;
+    }
+
+    /* ── STARS ── */
+    #stars-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* ── LAYOUT ── */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      position: relative;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,14,26,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .nav-logo {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--white);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .nav-logo span { color: var(--teal); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      margin-left: auto;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 400;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-cta {
+      background: var(--teal);
+      color: #000 !important;
+      padding: 10px 22px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+
+    .nav-cta:hover { opacity: 0.88; }
+
+    /* ── HERO ── */
+    .hero {
+      display: flex;
+      align-items: flex-start;
+      padding: 48px 0 80px;
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 460px;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-text { display: flex; flex-direction: column; align-items: flex-start; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(126,240,210,0.1);
+      border: 1px solid rgba(126,240,210,0.25);
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+
+    .hero-h1 {
+      font-size: clamp(28px, 3.8vw, 48px);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+      max-width: 480px;
+    }
+
+    .hero-h1 span { color: var(--teal); }
+
+    .hero-sub {
+      font-size: clamp(14px, 1.2vw, 16px);
+      color: var(--text);
+      max-width: 400px;
+      line-height: 1.65;
+      margin-bottom: 32px;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      justify-content: flex-start;
+    }
+
+    /* ── STAT CHIPS ── */
+    .stat-chips {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .stat-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .stat-chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      flex-shrink: 0;
+    }
+
+    /* ── PHONE FRAME ── */
+    .phone-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px 20px;
+    }
+
+    .phone-wrap .phone-frame {
+      width: 220px !important;
+      height: 477px !important;
+      border-radius: 40px;
+      flex-shrink: 0;
+    }
+
+    .phone-wrap .phone-frame:first-child {
+      transform: rotate(-6deg) translateX(24px) translateY(24px);
+      z-index: 2;
+      box-shadow: -8px 24px 60px rgba(0,0,0,0.6);
+    }
+
+    .phone-wrap .phone-frame:last-child {
+      transform: rotate(4deg) translateX(-24px) translateY(20px);
+      z-index: 1;
+      box-shadow: 8px 24px 60px rgba(0,0,0,0.5);
+    }
+
+    .phone-frame {
+      width: 320px;
+      height: 695px;
+      background: #0a0e1a;
+      border-radius: 48px;
+      border: 2px solid rgba(255,255,255,0.15);
+      box-shadow: 0 0 0 8px rgba(255,255,255,0.04), inset 0 0 0 1px rgba(255,255,255,0.06);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 18px;
+      background: #000;
+      border-radius: 100px;
+      z-index: 10;
+    }
+
+    .phone-screen {
+      position: absolute;
+      inset: 0;
+      padding: 56px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--teal);
+      color: #000;
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 100px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover { opacity: 0.88; }
+
+    .appstore-badge {
+      display: inline-block;
+      text-decoration: none;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .appstore-badge:hover { opacity: 0.82; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: var(--white);
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 500;
+      padding: 14px 28px;
+      border-radius: 100px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+    /* ── SCORE CARD ── */
+    .score-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 680px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      text-align: left;
+    }
+
+    .score-rows { display: flex; flex-direction: column; gap: 14px; }
+
+    .score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+    }
+
+    .score-label { color: var(--text-dim); }
+    .score-val { color: var(--white); font-weight: 500; }
+
+    .score-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 140px;
+    }
+
+    .score-number {
+      font-size: 72px;
+      font-weight: 700;
+      color: var(--teal);
+      line-height: 1;
+      letter-spacing: -2px;
+    }
+
+    .score-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .score-verdict {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--teal);
+    }
+
+    .score-divider {
+      grid-column: 1 / -1;
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 0;
+    }
+
+    .score-window {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-dim);
+      justify-content: center;
+    }
+
+    .score-window strong { color: var(--white); }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      flex-shrink: 0;
+    }
+
+    /* ── SECTION SHELLS ── */
+    .section-pad {
+      padding: 100px 0;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 16px;
+    }
+
+    .section-h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text);
+      max-width: 520px;
+      line-height: 1.65;
+      margin-bottom: 56px;
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── FEATURES GRID ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .feat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+    }
+
+    .feat-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    .feat-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+
+    .feat-body {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    /* ── RATINGS GRID ── */
+    .ratings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .rating-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+    }
+
+    .rating-name {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .rating-range {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+
+    .rating-desc {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .excellent { color: #8fd0ff; }
+    .good { color: #7ef0d2; }
+    .fair { color: #ffce8f; }
+    .poor { color: #c4ccd6; }
+
+    /* ── FACTORS GRID ── */
+    .factors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .factor-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 28px;
+    }
+
+    .factor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .factor-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .factor-weight {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    .factor-bar-track {
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin-bottom: 14px;
+    }
+
+    .factor-bar {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 2px;
+      opacity: 0.7;
+    }
+
+    .factor-desc {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── PRICING ── */
+    .pricing-section {
+      text-align: center;
+    }
+
+    .pricing-section .section-sub {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .price-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 28px;
+      padding: 48px 40px;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .price-kicker {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 6px;
+    }
+
+    .price-headline {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .price-sub {
+      font-size: 15px;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+    }
+
+    .price-features {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 16px;
+      margin-bottom: 28px;
+    }
+
+    .price-features li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .price-features li::before {
+      content: '';
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(126,240,210,0.15);
+      border: 1px solid var(--teal);
+      flex-shrink: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 5l2.5 2.5L8 3' stroke='%237ef0d2' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .price-plans { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+    .price-plan {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      transition: none;
+    }
+
+
+    .price-plan-main { flex: 1 }
+
+    .price-plan-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+
+    .price-plan-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .price-badge {
+      background: var(--teal);
+      color: #04130f;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 6px;
+    }
+
+    .price-plan-note {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-align: left;
+    }
+
+    .price-plan-note .save { color: var(--teal); font-weight: 600; }
+
+    .price-plan-amt {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .price-plan-num {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--white);
+      display: block;
+    }
+
+    .price-plan-per {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .price-note {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    #price-cta-note {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      text-align: center;
+      padding: 100px 24px;
+    }
+
+    .cta-section .section-h2 { margin-bottom: 12px; }
+    .cta-section .section-sub { margin: 0 auto 40px; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-left { display: flex; flex-direction: column; gap: 6px; }
+
+    .footer-logo {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .footer-logo span { color: var(--teal); }
+    .footer-copy { font-size: 13px; color: var(--text-dim); }
+
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 14px;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--white); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 60px; }
+      .hero-text { align-items: center; text-align: center; }
+      .hero-sub { max-width: 100%; }
+      .hero-btns { justify-content: center; }
+      .stat-chips { justify-content: center; }
+      .phone-frame { width: 280px; height: 608px; }
+    }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .ratings-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .price-card { padding: 36px 24px; }
+      .phone-frame { width: 240px; height: 521px; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="stars-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Clear<span>Night</span></a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+    </ul>
+    <a href="https://apps.apple.com" target="_blank" class="nav-cta">Download</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <h1 class="hero-h1">Know when the <span>stars are worth chasing</span></h1>
+      <p class="hero-sub">ClearNight gives you a single clarity score for tonight's sky — based on cloud cover, moon phase, seeing, and light pollution — so you always know before you go.</p>
+      <div class="hero-btns">
+        <a href="https://apps.apple.com" target="_blank" class="appstore-badge">
+          <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" height="52" />
+        </a>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" style="padding: 0; overflow: hidden;">
+          <img src="app-screenshot.png" alt="ClearNight home screen" style="width: 100%; height: 100%; object-fit: cover; object-position: top; display: block;" />
+        </div>
+      </div>
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" style="padding: 0; overflow: hidden;">
+          <img src="screenshot-detail.png" alt="ClearNight target detail screen" style="width: 100%; height: 100%; object-fit: cover; object-position: top; display: block;" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- FEATURES -->
+<section id="features" class="section-pad">
+  <div class="wrap">
+    <div class="section-label">Features</div>
+    <h2 class="section-h2">Everything you need<br>to plan a session</h2>
+    <p class="section-sub">Built for astronomers, astrophotographers, and anyone who looks up.</p>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">☁</div>
+        <div class="feat-title">Clarity score</div>
+        <p class="feat-body">One number combining cloud cover, moon phase, atmospheric seeing, and Bortle light pollution into a single Excellent/Good/Fair/Poor rating.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🌙</div>
+        <div class="feat-title">Best viewing window</div>
+        <p class="feat-body">Find the clearest window between dusk and dawn — not just whether tonight is clear, but exactly when to be outside.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📅</div>
+        <div class="feat-title">7-night forecast</div>
+        <p class="feat-body">See the week ahead at a glance. Plan around your schedule, not just tonight's weather.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔭</div>
+        <div class="feat-title">Prime targets</div>
+        <p class="feat-body">Know which objects are worth chasing tonight — planets, deep sky, meteor showers — with rise/set timing and direction.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔔</div>
+        <div class="feat-title">Sky alerts</div>
+        <p class="feat-body">Set a threshold and get notified the evening before or day of when conditions hit your score. Never miss a clear night.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📍</div>
+        <div class="feat-title">Multiple locations</div>
+        <p class="feat-body">Save your home, your dark sky spot, and anywhere else. Switch between them instantly and compare forecasts side by side.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" class="section-pad">
+  <div class="wrap">
+    <div class="section-label">How it works</div>
+    <h2 class="section-h2">One score. Four ratings.</h2>
+    <p class="section-sub">We combine four factors into a 0–100 score, then translate it into a simple rating so you never have to do the math.</p>
+
+    <div class="ratings-grid">
+      <div class="rating-card">
+        <div class="rating-name excellent">Excellent</div>
+        <div class="rating-range">78–100</div>
+        <p class="rating-desc">Exceptional night. Pack your gear and head out — conditions don't get much better than this.</p>
+      </div>
+      <div class="rating-card">
+        <div class="rating-name good">Good</div>
+        <div class="rating-range">62–77</div>
+        <p class="rating-desc">Solid session ahead. Some minor factors at play but the sky will reward you.</p>
+      </div>
+      <div class="rating-card">
+        <div class="rating-name fair">Fair</div>
+        <div class="rating-range">42–61</div>
+        <p class="rating-desc">Workable. Bright targets and wide-field viewing are still possible.</p>
+      </div>
+      <div class="rating-card">
+        <div class="rating-name poor">Poor</div>
+        <div class="rating-range">0–41</div>
+        <p class="rating-desc">Stay in. Heavy clouds, bright moon, or both — save your energy for a better night.</p>
+      </div>
+    </div>
+
+    <div class="factors-grid">
+      <div class="factor-card">
+        <div class="factor-header">
+          <span class="factor-name">Cloud cover</span>
+          <span class="factor-weight">45%</span>
+        </div>
+        <div class="factor-bar-track"><div class="factor-bar" style="width:45%"></div></div>
+        <p class="factor-desc">The biggest single factor. Even thin cloud cover scatters light and ruins transparency.</p>
+      </div>
+      <div class="factor-card">
+        <div class="factor-header">
+          <span class="factor-name">Moon illumination</span>
+          <span class="factor-weight">20%</span>
+        </div>
+        <div class="factor-bar-track"><div class="factor-bar" style="width:20%"></div></div>
+        <p class="factor-desc">A full moon washes out faint targets. New moon nights score significantly higher.</p>
+      </div>
+      <div class="factor-card">
+        <div class="factor-header">
+          <span class="factor-name">Bortle scale</span>
+          <span class="factor-weight">20%</span>
+        </div>
+        <div class="factor-bar-track"><div class="factor-bar" style="width:20%"></div></div>
+        <p class="factor-desc">Light pollution from cities. Bortle 1–3 is dark sky territory; 8–9 is bright urban sky.</p>
+      </div>
+      <div class="factor-card">
+        <div class="factor-header">
+          <span class="factor-name">Atmospheric seeing</span>
+          <span class="factor-weight">15%</span>
+        </div>
+        <div class="factor-bar-track"><div class="factor-bar" style="width:15%"></div></div>
+        <p class="factor-desc">Air turbulence at altitude. Poor seeing blurs stars and planets even on a clear night.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- PRICING -->
+<section id="pricing" class="section-pad pricing-section">
+  <div class="wrap">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-h2">Free + Premium</h2>
+    <p class="section-sub">Start free. Upgrade when you're ready.</p>
+
+    <div class="price-card">
+      <div class="price-kicker">ClearNight Premium</div>
+      <div class="price-headline">Never miss a clear night</div>
+      <p class="price-sub">Plan ahead, chase every GO window, and get a nudge the moment the sky opens up.</p>
+
+      <ul class="price-features">
+        <li>Unlimited saved spots</li>
+        <li>Full 7-night forecast</li>
+        <li>Sky alerts + lookahead</li>
+        <li>Prime targets &amp; timing</li>
+        <li>Hour-by-hour clarity</li>
+        <li>Gear-tuned scoring</li>
+      </ul>
+
+      <div class="price-plans">
+        <div class="price-plan">
+          <div class="price-plan-main">
+            <div class="price-plan-name-row">
+              <span class="price-plan-name">Annual</span>
+              <span class="price-badge">Best value</span>
+            </div>
+            <div class="price-plan-note">7-day free trial, then billed yearly · <span class="save">Save 46%</span></div>
+          </div>
+          <div class="price-plan-amt">
+            <span class="price-plan-num">$12.99</span>
+            <span class="price-plan-per">/year</span>
+          </div>
+        </div>
+
+        <div class="price-plan">
+
+          <div class="price-plan-main">
+            <div class="price-plan-name-row">
+              <span class="price-plan-name">Monthly</span>
+            </div>
+            <div class="price-plan-note">7-day free trial, then monthly</div>
+          </div>
+          <div class="price-plan-amt">
+            <span class="price-plan-num">$1.99</span>
+            <span class="price-plan-per">/month</span>
+          </div>
+        </div>
+
+        <div class="price-plan">
+
+          <div class="price-plan-main">
+            <div class="price-plan-name-row">
+              <span class="price-plan-name">Lifetime</span>
+            </div>
+            <div class="price-plan-note">Pay once — yours forever, no subscription</div>
+          </div>
+          <div class="price-plan-amt">
+            <span class="price-plan-num">$29.99</span>
+            <span class="price-plan-per">once</span>
+          </div>
+        </div>
+      </div>
+
+      <a href="https://apps.apple.com" target="_blank" class="btn-primary" style="width:100%;justify-content:center;">Download on the App Store</a>
+      <p class="price-note">Plans are purchased inside the app. Includes a 7-day free trial.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-copy">© 2026 Strange Glyph, LLC</div>
+    </div>
+    <ul class="footer-links">
+      <li><a href="privacy.html">Privacy Policy</a></li>
+      <li><a href="terms.html">Terms of Use</a></li>
+      <li><a href="support.html">Support</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  // Animated star field
+  const canvas = document.getElementById('stars-canvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = document.body.scrollHeight;
+    generateStars();
+  }
+
+  function generateStars() {
+    const count = Math.floor((canvas.width * canvas.height) / 4000);
+    stars = Array.from({ length: count }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.2 + 0.2,
+      a: Math.random(),
+      speed: Math.random() * 0.003 + 0.001,
+      phase: Math.random() * Math.PI * 2,
+    }));
+  }
+
+  function drawStars(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const s of stars) {
+      const alpha = s.a * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(drawStars);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(drawStars);
+</script>
+
+</body>
+</html>
