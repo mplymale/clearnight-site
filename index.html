@@ -773,21 +773,68 @@
 
     .footer-links a:hover { color: var(--white); }
 
+    /* ── HAMBURGER ── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+      flex-shrink: 0;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+    .nav-mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: rgba(10,14,26,0.97);
+      border-top: 1px solid var(--border);
+      padding: 16px 24px 24px;
+      gap: 0;
+    }
+    .nav-mobile-menu a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 500;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-mobile-menu a:last-child { border-bottom: none; }
+    .nav-mobile-menu.open { display: flex; }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
-      .hero-inner { grid-template-columns: 1fr; gap: 60px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 48px; }
       .hero-text { align-items: center; text-align: center; }
       .hero-sub { max-width: 100%; }
       .hero-btns { justify-content: center; }
       .stat-chips { justify-content: center; }
-      .phone-frame { width: 280px; height: 608px; }
+      .phone-wrap { justify-content: center; }
+      .phone-wrap .phone-frame { width: 240px !important; height: 521px !important; }
     }
     @media (max-width: 640px) {
       .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
       .ratings-grid { grid-template-columns: 1fr; }
       .footer-inner { flex-direction: column; align-items: flex-start; }
       .price-card { padding: 36px 24px; }
-      .phone-frame { width: 240px; height: 521px; }
+      .hero { overflow: hidden; }
+      .hero-inner { width: 100%; }
+      .hero-text { width: 100%; }
+      .hero-h1 { font-size: clamp(22px, 6vw, 36px); max-width: 100%; word-break: break-word; }
+      .hero-sub { font-size: 15px; max-width: 100%; }
+      .appstore-badge img { height: 44px; max-width: 100%; }
+      .phone-wrap { justify-content: center; }
+      .phone-wrap .phone-frame { width: 160px !important; height: 347px !important; }
     }
   </style>
 </head>
@@ -798,6 +845,9 @@
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
     <a href="#" class="nav-logo">Clear<span>Night</span></a>
     <ul class="nav-links">
       <li><a href="#features">Features</a></li>
@@ -806,7 +856,17 @@
     </ul>
     <a href="https://apps.apple.com" target="_blank" class="nav-cta">Download</a>
   </div>
+  <div class="nav-mobile-menu" id="mobile-menu">
+    <a href="#features" onclick="document.getElementById('mobile-menu').classList.remove('open')">Features</a>
+    <a href="#how-it-works" onclick="document.getElementById('mobile-menu').classList.remove('open')">How it works</a>
+    <a href="#pricing" onclick="document.getElementById('mobile-menu').classList.remove('open')">Pricing</a>
+  </div>
 </nav>
+<script>
+  document.getElementById('hamburger').addEventListener('click', function() {
+    document.getElementById('mobile-menu').classList.toggle('open');
+  });
+</script>
 
 <!-- HERO -->
 <section class="hero">
