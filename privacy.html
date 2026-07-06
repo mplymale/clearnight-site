@@ -4,14 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Privacy Policy — ClearNight</title>
+  <meta name="description" content="ClearNight privacy policy." />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
       --bg: #0a0e1a;
+      --surface: rgba(255,255,255,0.04);
       --border: rgba(255,255,255,0.08);
       --teal: #7ef0d2;
       --text: rgba(255,255,255,0.72);
@@ -19,120 +22,198 @@
       --white: #fff;
       --font: 'Space Grotesk', system-ui, sans-serif;
     }
+
     html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.7; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+    }
 
     nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(10,14,26,0.9); backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,14,26,0.92);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
+
     .nav-inner {
-      max-width: 800px; margin: 0 auto; padding: 0 24px;
-      height: 64px; display: flex; align-items: center; justify-content: space-between;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
     }
-    .nav-logo { font-size: 20px; font-weight: 700; color: var(--white); text-decoration: none; }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--white);
+      text-decoration: none;
+    }
     .nav-logo span { color: var(--teal); }
-    .nav-back { font-size: 14px; color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
-    .nav-back:hover { color: var(--white); }
 
-    .content { max-width: 800px; margin: 0 auto; padding: 64px 24px 100px; }
-    h1 { font-size: 36px; font-weight: 700; color: var(--white); letter-spacing: -0.5px; margin-bottom: 8px; }
-    .updated { font-size: 13px; color: var(--text-dim); margin-bottom: 56px; }
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 56px 24px 96px;
+    }
 
-    .section { margin-bottom: 40px; }
-    .section h2 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 12px; }
-    .section p { font-size: 15px; color: var(--text); line-height: 1.75; white-space: pre-line; }
+    .page-header {
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .page-header p {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--white);
+      margin: 40px 0 12px;
+    }
+
+    p {
+      color: var(--text);
+      margin-bottom: 14px;
+      line-height: 1.7;
+    }
+
+    ul {
+      margin: 0 0 14px 20px;
+      color: var(--text);
+      line-height: 1.8;
+    }
+
+    ul li { margin-bottom: 4px; }
+
+    a {
+      color: var(--teal);
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+
+    .callout {
+      background: rgba(126,240,210,0.06);
+      border: 1px solid rgba(126,240,210,0.15);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 24px 0;
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.65;
+    }
 
     footer {
-      border-top: 1px solid var(--border); padding: 32px 24px;
-      max-width: 800px; margin: 0 auto;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-dim);
     }
-    .footer-logo { font-size: 15px; font-weight: 600; color: var(--white); }
-    .footer-logo span { color: var(--teal); }
-    .footer-copy { font-size: 13px; color: var(--text-dim); }
-    .footer-links { display: flex; gap: 24px; list-style: none; }
-    .footer-links a { font-size: 13px; color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--white); }
+
+    footer a { color: var(--text-dim); }
+    footer a:hover { color: var(--white); }
   </style>
 </head>
 <body>
+
 <nav>
   <div class="nav-inner">
     <a href="/" class="nav-logo">Clear<span>Night</span></a>
-    <a href="/" class="nav-back">← Back</a>
   </div>
 </nav>
 
-<div class="content">
-  <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: July 2026</p>
-
-  <div class="section">
-    <h2>Overview</h2>
-    <p>ClearNight ("we", "our", or "us") is committed to protecting your privacy. This policy explains what information we collect, how we use it, and your choices regarding your data.</p>
+<div class="wrap">
+  <div class="page-header">
+    <h1>Privacy Policy</h1>
+    <p>Strange Glyph, LLC &nbsp;·&nbsp; Last updated July 6, 2026</p>
   </div>
 
-  <div class="section">
-    <h2>Information We Collect</h2>
-    <p>Location data: We request access to your device's location to generate sky forecasts for your area. Location is used only locally on your device and is not transmitted to our servers.
-
-Usage data: We may collect anonymous, aggregated usage statistics to improve the app. This data cannot be used to identify you personally.
-
-Purchase data: If you subscribe to ClearNight Premium, Apple handles all payment processing. We do not store your payment information.</p>
+  <div class="callout">
+    The short version: ClearNight uses your location to fetch sky conditions. If you enable alerts, your push token is stored on our servers. We don't sell your data, run ads, or track your behavior.
   </div>
 
-  <div class="section">
-    <h2>How We Use Your Information</h2>
-    <p>• To generate accurate sky and weather forecasts for your location
-• To deliver push notifications you have opted into
-• To restore your subscription status across devices
-• To improve app performance and fix bugs</p>
-  </div>
+  <h2>Who we are</h2>
+  <p>ClearNight is made by Strange Glyph, LLC. If you have questions about this policy, email us at <a href="mailto:info@strangeglyph.com">info@strangeglyph.com</a>.</p>
 
-  <div class="section">
-    <h2>Data Sharing</h2>
-    <p>We do not sell, trade, or rent your personal information to third parties. We may share anonymized, aggregated data with analytics providers to help us understand how the app is used.</p>
-  </div>
+  <h2>What we collect</h2>
 
-  <div class="section">
-    <h2>Push Notifications</h2>
-    <p>If you enable alerts, your device push token is securely stored on our servers to deliver timely sky condition notifications. You can disable notifications at any time in your device settings.</p>
-  </div>
+  <p><strong style="color: var(--white);">Location</strong><br>
+  ClearNight uses your device's location to fetch weather, atmospheric, and astronomical data for your area. Location is used only to make requests to third-party forecast APIs — it is not stored on our servers. You can also add locations manually without granting location permission.</p>
 
-  <div class="section">
-    <h2>Data Storage</h2>
-    <p>Your saved locations and alert preferences are stored securely on our servers linked to an anonymous account, so your data is restored if you reinstall the app. No personally identifiable information is required to create this account.
+  <p><strong style="color: var(--white);">Push notification token</strong><br>
+  If you enable sky alerts, we store your device's push notification token on our servers so we can send you a notification when your sky clears up. This token is associated with an anonymous account — no name, email, or personal information is required. You can revoke this at any time by disabling notifications in Settings.</p>
 
-You can delete your data at any time by contacting us at info@strangeglyph.com.</p>
-  </div>
+  <p><strong style="color: var(--white);">Anonymous account</strong><br>
+  To deliver alerts, ClearNight creates an anonymous account on your behalf using Supabase. This account has no username, email, or password — it exists solely to link your push token to your alert preferences. No personal information is attached.</p>
 
-  <div class="section">
-    <h2>Children's Privacy</h2>
-    <p>ClearNight is not directed at children under 13. We do not knowingly collect personal information from children under 13.</p>
-  </div>
+  <p><strong style="color: var(--white);">Saved locations and preferences</strong><br>
+  Your saved locations, alert thresholds, and app preferences are stored locally on your device. They are not uploaded to our servers unless you enable alerts, in which case your alert preferences are synced to your anonymous account.</p>
 
-  <div class="section">
-    <h2>Changes to This Policy</h2>
-    <p>We may update this Privacy Policy from time to time. We will notify you of any significant changes by updating the date at the top of this page.</p>
-  </div>
+  <h2>What we don't collect</h2>
+  <ul>
+    <li>No name, email, or contact information</li>
+    <li>No account login (unless you choose to create one for future premium features)</li>
+    <li>No advertising identifiers or tracking pixels</li>
+    <li>No analytics or crash reporting services</li>
+    <li>No payment information — purchases are handled entirely by Apple</li>
+  </ul>
 
-  <div class="section">
-    <h2>Contact Us</h2>
-    <p>If you have questions about this Privacy Policy, please contact us at <a href="mailto:info@strangeglyph.com" style="color: var(--teal);">info@strangeglyph.com</a></p>
-  </div>
+  <h2>Third-party services</h2>
+  <p>ClearNight uses the following third-party services to function:</p>
+  <ul>
+    <li><strong style="color: var(--white);">Open-Meteo</strong> — weather and atmospheric forecast data. Your approximate location coordinates are sent to fetch conditions. See their <a href="https://open-meteo.com/en/terms" target="_blank">privacy policy</a>.</li>
+    <li><strong style="color: var(--white);">Supabase</strong> — backend infrastructure for storing push tokens and alert preferences. Data is stored in the United States. See their <a href="https://supabase.com/privacy" target="_blank">privacy policy</a>.</li>
+    <li><strong style="color: var(--white);">Apple Push Notification service (APNs)</strong> — used to deliver sky alerts to your device.</li>
+  </ul>
+
+  <h2>In-app purchases</h2>
+  <p>ClearNight offers optional premium features through Apple's in-app purchase system. All payment processing is handled by Apple. We receive only a confirmation of the purchase — no card number, billing address, or payment details are shared with us.</p>
+
+  <h2>Data retention</h2>
+  <p>Your push token and alert preferences are retained as long as you have alerts enabled. If you disable all alerts, this data is no longer needed and can be deleted upon request. Local data on your device (saved locations, preferences) can be removed at any time by uninstalling the app.</p>
+
+  <h2>Your rights</h2>
+  <p>You can:</p>
+  <ul>
+    <li>Disable location access at any time in your device's Settings</li>
+    <li>Disable push notifications at any time in your device's Settings</li>
+    <li>Request deletion of any data we hold by emailing <a href="mailto:info@strangeglyph.com">info@strangeglyph.com</a></li>
+  </ul>
+
+  <h2>Children</h2>
+  <p>ClearNight is not directed at children under 13. We do not knowingly collect any information from children.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If we make material changes, we'll update the date at the top of this page. Continued use of the app after changes constitutes acceptance of the revised policy.</p>
+
+  <h2>Contact</h2>
+  <p>Questions or requests: <a href="mailto:info@strangeglyph.com">info@strangeglyph.com</a></p>
+
 </div>
 
 <footer>
-  <div>
-    <div class="footer-copy">© 2026 Strange Glyph, LLC</div>
-  </div>
-  <ul class="footer-links">
-    <li><a href="/privacy">Privacy Policy</a></li>
-    <li><a href="/terms">Terms of Use</a></li>
-    <li><a href="mailto:info@strangeglyph.com">Support</a></li>
-  </ul>
+  <a href="/">ClearNight</a> &nbsp;·&nbsp; © 2026 Strange Glyph, LLC &nbsp;·&nbsp; <a href="privacy.html">Privacy Policy</a>
 </footer>
+
 </body>
 </html>
