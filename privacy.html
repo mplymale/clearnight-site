@@ -145,7 +145,7 @@
 <div class="wrap">
   <div class="page-header">
     <h1>Privacy Policy</h1>
-    <p>Strange Glyph, LLC &nbsp;·&nbsp; Last updated July 6, 2026</p>
+    <p>Strange Glyph, LLC &nbsp;·&nbsp; Last updated July 15, 2026</p>
   </div>
 
   <div class="callout">
@@ -158,7 +158,7 @@
   <h2>What we collect</h2>
 
   <p><strong style="color: var(--white);">Location</strong><br>
-  ClearNight uses your device's location to fetch weather, atmospheric, and astronomical data for your area. Location is used only to make requests to third-party forecast APIs — it is not stored on our servers. You can also add locations manually without granting location permission.</p>
+  ClearNight uses your device's location to fetch weather, atmospheric, and astronomical data for your area. When you save a spot, its coordinates are stored on our servers (via Supabase), tied to an anonymous account — no name, email, or other personal information is required. You can also add locations manually without granting location permission.</p>
 
   <p><strong style="color: var(--white);">Push notification token</strong><br>
   If you enable sky alerts, we store your device's push notification token on our servers so we can send you a notification when your sky clears up. This token is associated with an anonymous account — no name, email, or personal information is required. You can revoke this at any time by disabling notifications in Settings.</p>
@@ -167,12 +167,12 @@
   To deliver alerts, ClearNight creates an anonymous account on your behalf using Supabase. This account has no username, email, or password — it exists solely to link your push token to your alert preferences. No personal information is attached.</p>
 
   <p><strong style="color: var(--white);">Saved locations and preferences</strong><br>
-  Your saved locations, alert thresholds, and app preferences are stored locally on your device. They are not uploaded to our servers unless you enable alerts, in which case your alert preferences are synced to your anonymous account.</p>
+  Your saved locations are stored on our servers (via Supabase), tied to your anonymous account, so they\'re restored if you reinstall the app or switch devices. Display preferences (like units and night vision mode) are stored locally on your device only.</p>
 
   <h2>What we don't collect</h2>
   <ul>
     <li>No name, email, or contact information</li>
-    <li>No account login (unless you choose to create one for future premium features)</li>
+    <li>No account login, name, or password required</li>
     <li>No advertising identifiers or tracking pixels</li>
     <li>No analytics or crash reporting services</li>
     <li>No payment information — purchases are handled entirely by Apple</li>
